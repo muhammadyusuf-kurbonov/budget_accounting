@@ -21,11 +21,18 @@ import java.text.NumberFormat
 fun HomeScreenContent(
     modifier: Modifier,
     persons: List<Person>,
-    onButtonClick: () -> Unit,
+    onNewPersonClick: () -> Unit,
+    onNew50InvoiceClick: () -> Unit,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(modifier = Modifier.align(Alignment.End), onClick = onButtonClick) {
-            Text("New person")
+        Row(modifier = Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onNew50InvoiceClick) {
+                Text("New invoice 50$")
+            }
+
+            Button(onClick = onNewPersonClick) {
+                Text("New person")
+            }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (persons.isEmpty()) {

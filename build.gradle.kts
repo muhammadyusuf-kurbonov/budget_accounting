@@ -4,10 +4,11 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("com.squareup.sqldelight").version("1.5.3")
 }
 
 group = "uz.qmgroup"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 val exposedVersion: String by project
 val composeDestinationsVersion: String by project
 
@@ -28,28 +29,32 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-
-                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-
-                implementation("org.xerial:sqlite-jdbc:3.39.3.0")
+                implementation("com.squareup.sqldelight:sqlite-driver:1.5.3")
+                implementation("com.squareup.sqldelight:coroutines-extensions:1.5.3")
             }
         }
         val jvmTest by getting
 
-        sourceSets.forEach {
-            it.kotlin.srcDir("build/generated/ksp/${it.name}/kotlin")
+        sqldelight {
+            database("AppDatabase") {
+                packageName = "uz.qmgroup.budget_accounting.database"
+                sourceFolders = listOf("sqldelight")
+                sourceSets {
+                    add(jvmMain)
+                    add(jvmTest)
+                }
+            }
         }
+
+
     }
 }
-
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Rpm)
-            packageName = "students_accounting"
+            packageName = "budget_accounting"
             packageVersion = "1.0.0"
         }
     }

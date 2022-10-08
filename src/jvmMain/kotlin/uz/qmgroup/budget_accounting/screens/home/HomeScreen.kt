@@ -30,14 +30,16 @@ fun HomeScreen(
 
     val state by viewModel.state.collectAsState()
 
-    Dialog(
-        visible = newPersonDialogShown,
-        onCloseRequest = { newPersonDialogShown = false },
-        resizable = false,
-        transparent = true,
-        undecorated = true
-    ) {
-        PersonDialog(modifier = Modifier.wrapContentSize(), dismiss = { newPersonDialogShown = false })
+    if (newPersonDialogShown) {
+        Dialog(
+            onCloseRequest = { newPersonDialogShown = false },
+            resizable = false,
+            transparent = true,
+            undecorated = true
+        ) {
+            PersonDialog(modifier = Modifier.wrapContentSize(), dismiss = { newPersonDialogShown = false })
+        }
+
     }
 
     AnimatedContent(state.javaClass) {
@@ -58,7 +60,8 @@ fun HomeScreen(
             is HomeScreenState.PersonsFetched -> {
                 HomeScreenContent(
                     modifier = modifier.fillMaxSize(),
-                    onButtonClick = { newPersonDialogShown = true },
+                    onNewPersonClick = { newPersonDialogShown = true },
+                    onNew50InvoiceClick = { viewModel.createInvoice(50f) },
                     persons = current.list
                 )
             }

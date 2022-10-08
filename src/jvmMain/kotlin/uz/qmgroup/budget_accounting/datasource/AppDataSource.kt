@@ -1,35 +1,51 @@
 package uz.qmgroup.budget_accounting.datasource
 
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.transactions.transaction
-import uz.qmgroup.budget_accounting.datasource.dao.PersonsDao
-import uz.qmgroup.budget_accounting.datasource.entities.PersonEntity
-import uz.qmgroup.budget_accounting.datasource.entities.Transaction
+import com.squareup.sqldelight.EnumColumnAdapter
+import com.squareup.sqldelight.db.SqlDriver
+import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
+import uz.qmgroup.TransactionEntity
+import uz.qmgroup.budget_accounting.database.AppDatabase
+import uz.qmgroup.budget_accounting.database.TransactionTypes
 
-class AppDataSource private constructor() {
+class AppDataSource private constructor(
+    private val database: AppDatabase,
+) : AppDatabase by database {
     companion object {
         private var instance: AppDataSource? = null
         private val lock: Any = Any()
         fun getInstance(): AppDataSource = synchronized(lock) {
             if (instance == null) {
-                Database.connect("jdbc:sqlite:sample.db")
-
-                transaction {
-                    addLogger(StdOutSqlLogger)
-
-                    SchemaUtils.createMissingTablesAndColumns(
-                        PersonEntity.table,
-                        Transaction.table
+                val driver: SqlDriver = JdbcSqliteDriver("jdbc:sqlite:sample.db")
+                AppDatabase.Schema.create(driver)
+                instance = AppDataSource(
+                    AppDatabase(
+                        driver, transactionEntityAdapter = TransactionEntity.Adapter(
+                            typeAdapter = EnumColumnAdapter()
+                        )
                     )
-                }
-
-                instance = AppDataSource()
+                )
             }
+
             return instance!!
         }
     }
-    val personDao by lazy { PersonsDao() }
+
+    fun createInvoice(amount: Double, note: String? = null) {
+        transactionQueries.transaction {
+            personTableQueries.getAllPersons().executeAsList().forEach {
+                transactionQueries.insertTransaction(
+                    amount = amount,
+                    note = note ?: "",
+                    type = TransactionTypes.INVOICE,
+                    personId = it.id,
+                    id = null
+                )
+
+                personTableQueries.updateBalance(
+                    it.balance - amount,
+                    it.id
+                )
+            }
+        }
+    }
 }

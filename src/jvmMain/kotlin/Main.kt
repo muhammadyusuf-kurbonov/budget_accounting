@@ -7,6 +7,7 @@ import uz.qmgroup.budget_accounting.screens.app.AppViewModel
 
 fun main() = application {
     val viewModel = remember { AppViewModel() }
+
     Window(
         onCloseRequest = ::exitApplication,
         title = "Budget accounting",

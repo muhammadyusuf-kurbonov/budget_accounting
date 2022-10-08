@@ -12,6 +12,7 @@ fun PersonDialog(
     val viewModel = remember { PersonDialogViewModel() }
 
     DisposableEffect(Unit) {
+        viewModel.initialize()
         onDispose { viewModel.clear() }
     }
 
