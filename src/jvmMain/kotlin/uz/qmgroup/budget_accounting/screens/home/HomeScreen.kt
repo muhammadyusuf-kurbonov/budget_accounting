@@ -40,8 +40,8 @@ fun HomeScreen(
         PersonDialog(modifier = Modifier.wrapContentSize(), dismiss = { newPersonDialogShown = false })
     }
 
-    AnimatedContent(state) {
-        when (it) {
+    AnimatedContent(state.javaClass) {
+        when (val current = state) {
             HomeScreenState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Column(
@@ -59,7 +59,7 @@ fun HomeScreen(
                 HomeScreenContent(
                     modifier = modifier.fillMaxSize(),
                     onButtonClick = { newPersonDialogShown = true },
-                    persons = it.list
+                    persons = current.list
                 )
             }
         }

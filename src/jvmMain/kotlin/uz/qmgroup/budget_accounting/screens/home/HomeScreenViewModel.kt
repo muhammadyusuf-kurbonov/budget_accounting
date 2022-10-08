@@ -12,9 +12,11 @@ class HomeScreenViewModel: ViewModel() {
 
     fun initialize() {
         viewModelScope.launch {
-            val list = AppDataSource.getInstance().getAllPersons()
-
-            _state.tryEmit(HomeScreenState.PersonsFetched(list))
+            launch {
+                AppDataSource.getInstance().personDao.watchAll().collect {
+                    _state.tryEmit(HomeScreenState.PersonsFetched(it))
+                }
+            }
         }
     }
 }

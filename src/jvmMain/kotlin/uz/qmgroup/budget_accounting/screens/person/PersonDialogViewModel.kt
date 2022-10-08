@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.qmgroup.budget_accounting.base.ViewModel
 import uz.qmgroup.budget_accounting.datasource.AppDataSource
+import uz.qmgroup.budget_accounting.datasource.models.Person
 import java.text.NumberFormat
 
 class PersonDialogViewModel: ViewModel() {
@@ -33,10 +34,9 @@ class PersonDialogViewModel: ViewModel() {
     fun save() {
         _state.update { it.copy(isSaving = true)}
         viewModelScope.launch {
-            AppDataSource.getInstance().createPerson {
-                this.name = state.value.name
-                this.balance = state.value.initialBalance
-            }
+            AppDataSource.getInstance()
+                .personDao
+                .insert(Person(name = _state.value.name, balance =  _state.value.initialBalance))
             _state.update { it.copy(isSaving = false, isSaveCompleted = true)}
         }
     }
