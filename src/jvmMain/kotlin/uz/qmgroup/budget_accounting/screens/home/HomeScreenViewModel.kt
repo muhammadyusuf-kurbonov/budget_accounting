@@ -23,8 +23,4 @@ class HomeScreenViewModel : ViewModel() {
             }
         }
     }
-
-    fun createInvoice(amount: Float) {
-        AppDataSource.getInstance().createInvoice(amount = amount.toDouble())
-    }
 }

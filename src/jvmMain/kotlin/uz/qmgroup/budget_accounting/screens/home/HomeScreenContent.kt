@@ -27,7 +27,7 @@ fun HomeScreenContent(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(modifier = Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = onNew50InvoiceClick) {
-                Text("New invoice 50$")
+                Text("New transaction")
             }
 
             Button(onClick = onNewPersonClick) {

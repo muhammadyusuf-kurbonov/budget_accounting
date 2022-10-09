@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import uz.qmgroup.budget_accounting.screens.person.PersonDialog
+import uz.qmgroup.budget_accounting.screens.transactions.TransactionDialog
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -19,6 +20,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     var newPersonDialogShown by remember { mutableStateOf(false) }
+    var newTransactionDialogShown by remember { mutableStateOf(false) }
 
     val viewModel = remember { HomeScreenViewModel() }
 
@@ -39,7 +41,17 @@ fun HomeScreen(
         ) {
             PersonDialog(modifier = Modifier.wrapContentSize(), dismiss = { newPersonDialogShown = false })
         }
+    }
 
+    if (newTransactionDialogShown) {
+        Dialog(
+            onCloseRequest = { newTransactionDialogShown = false },
+            resizable = false,
+            transparent = true,
+            undecorated = true,
+        ) {
+            TransactionDialog(modifier = Modifier.wrapContentSize(), dismiss = { newTransactionDialogShown = false })
+        }
     }
 
     AnimatedContent(state.javaClass) {
@@ -61,7 +73,7 @@ fun HomeScreen(
                 HomeScreenContent(
                     modifier = modifier.fillMaxSize(),
                     onNewPersonClick = { newPersonDialogShown = true },
-                    onNew50InvoiceClick = { viewModel.createInvoice(50f) },
+                    onNew50InvoiceClick = { newTransactionDialogShown = true },
                     persons = current.list
                 )
             }

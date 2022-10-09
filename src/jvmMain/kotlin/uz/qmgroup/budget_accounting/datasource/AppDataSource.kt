@@ -6,6 +6,7 @@ import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import uz.qmgroup.TransactionEntity
 import uz.qmgroup.budget_accounting.database.AppDatabase
 import uz.qmgroup.budget_accounting.database.TransactionTypes
+import uz.qmgroup.budget_accounting.datasource.models.Person
 
 class AppDataSource private constructor(
     private val database: AppDatabase,
@@ -46,6 +47,24 @@ class AppDataSource private constructor(
                     it.id
                 )
             }
+        }
+    }
+
+    fun createPayment(amount: Double, note: String? = null, person: Person) {
+        val personId = person.id ?: throw IllegalArgumentException()
+        transactionQueries.transaction {
+            transactionQueries.insertTransaction(
+                amount = amount,
+                note = note ?: "",
+                type = TransactionTypes.INVOICE,
+                personId = personId,
+                id = null
+            )
+
+            personTableQueries.updateBalance(
+                person.balance + amount,
+                personId
+            )
         }
     }
 }
